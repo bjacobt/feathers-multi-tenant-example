@@ -1,0 +1,397 @@
+{
+	"info": {
+		"_postman_id": "6aaa4198-a29f-44c3-9f3c-64061115c720",
+		"name": "feathers-multi-tenant",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create user",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"user1@exampletenant.com\",\n\t\"password\": \"changeme\",\n\t\"role\": \"standarduser\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3030/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. Create tenant 1 admin user",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "{{accessToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"admin@tenant1.com\",\n\t\"password\": \"changeme\",\n\t\"role\": \"admin\",\n\t\"tenantId\": \"{{tenant_1_id}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3030/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. Create tenant standard user",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "{{accessToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"user1@tenant1.com\",\n\t\"password\": \"changeme\",\n\t\"role\": \"standarduser\",\n\t\"tenantId\": \"{{tenant_1_id}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3030/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "1. authenticate superadmin",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "15ce9841-5199-4022-bd13-644dd2791eae",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "08d1504a-8a37-43e4-ad5d-118517d4d971",
+						"exec": [
+							"pm.test(\"Request was successful\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    pm.response.to.have.jsonBody()",
+							"});",
+							"",
+							"pm.test(\"AccessToken is present\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    const { accessToken } = jsonData;",
+							"    ",
+							"    pm.environment.set(\"accessToken\", accessToken);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"superadmin@example.com\",\n\t\"password\": \"changeme\",\n\t\"strategy\": \"local\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3030/authentication",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"authentication"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. authenticate tenant 1 standard user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "15ce9841-5199-4022-bd13-644dd2791eae",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "08d1504a-8a37-43e4-ad5d-118517d4d971",
+						"exec": [
+							"pm.test(\"Request was successful\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    pm.response.to.have.jsonBody()",
+							"});",
+							"",
+							"pm.test(\"AccessToken is present\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    const { accessToken } = jsonData;",
+							"    ",
+							"    pm.environment.set(\"accessToken\", accessToken);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"user1@tenant1.com\",\n\t\"password\": \"changeme\",\n\t\"strategy\": \"local\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3030/authentication",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"authentication"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6. create tenant 1 blog post",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"text\": \"belongs to user1 of tenant1.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3030/blog-post",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"blog-post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7. get blog posts",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{accessToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3030/blog-post",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"blog-post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. create tenant 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3f3330da-d8e4-4a5a-a4ae-ed2c917e8a6c",
+						"exec": [
+							"pm.test(\"Request was successful\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    pm.response.to.have.jsonBody()",
+							"});",
+							"",
+							"pm.test(\"AccessToken is present\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    const { id } = jsonData;",
+							"    ",
+							"    pm.environment.set(\"tenant_1_id\", id);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"tenant1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3030/tenant",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"tenant"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
